@@ -30,12 +30,12 @@ exports.resizeImage = functions
         })
         .then((data) =>
           resp.json(
-            Object.extend(responseJson, {
+            Object.assign(responseJson, {
               resizedImage: data.toString("base64"),
             })
           )
         )
-        .catch((err) => resp.json(Object.extend(responseJson, { error: err })));
+        .catch((err) => resp.json(Object.assign(responseJson, { error: err })));
     });
   });
 
