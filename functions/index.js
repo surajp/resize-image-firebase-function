@@ -3,6 +3,7 @@ const fetch = require("node-fetch");
 const sharp = require("sharp");
 const html_to_pdf = require("html-pdf-node");
 const cors = require("cors")({ origin: true });
+const JSZip = require("jszip");
 
 const runtimeOpts = {
   timeoutSeconds: 10,
@@ -50,3 +51,22 @@ exports.genPdf = functions.runWith(runtimeOpts).https.onRequest((req, resp) => {
     }
   });
 });
+
+exports.zipData = functions
+  .runWith(runtimeOpts)
+  .https.onRequest((req, resp) => {
+    cors(req, resp, async () => {
+      try {
+        const files = req.body.files;
+        const zip = new JSZip();
+        console.log(JSON.stringify(files));
+        files.forEach((f) => {
+          zip.file(f.name, f.content);
+        });
+        const b64 = await zip.generateAsync({ type: "base64" });
+        resp.json({ data: b64 });
+      } catch (err) {
+        resp.json({ error: JSON.stringify(err) });
+      }
+    });
+  });
